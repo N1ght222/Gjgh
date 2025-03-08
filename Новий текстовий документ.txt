@@ -32,6 +32,16 @@ class MainScr(Screen):
         layout.add_widget(btn4)
         self.add_widget(layout)
 
+class FirstScr(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout=FloatLayout()
+        btn = Button(text="Вибір", size_hint=(0.5, 0.2), pos_hint={'x': 0.25, 'y': 0.6})
+        btn_back = ScrButton(self, direction='up', goal='main', text="Назад", size_hint=(0.5, 0.2), pos_hint={'x': 0.25, 'y': 0.3})
+        layout.add_widget(btn)
+        layout.add_widget(btn_back)
+        self.add_widget(layout)
+
 # Define other screens (Screen1, Screen2, Screen3, Screen4) similarly to MainScr
 
 class MyApp(App):
@@ -39,7 +49,7 @@ class MyApp(App):
         sm = ScreenManager()
         sm.add_widget(MainScr(name='main'))
         # Add the other screens to the ScreenManager
-        # sm.add_widget(Screen1(name='first'))
+        sm.add_widget(Screen(name='first'))
         # sm.add_widget(Screen2(name='second'))
         # ...
         return sm
