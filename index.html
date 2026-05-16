@@ -1,134 +1,236 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Будешь моей девушкой?)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love You:з</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display:ital@0;1&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: #fff;
-      font-family: 'Nunito', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
+  body {
+    background: #0a0a0a;
+    overflow: hidden;
+    height: 100vh; width: 100vw;
+    font-family: 'Share Tech Mono', monospace;
+    color: #fff;
+  }
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 22px;
-      padding: 40px 20px;
-    }
+  #screen-intro {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 10;
+    transition: opacity 0.9s ease;
+  }
+  #screen-intro.hidden { opacity: 0; pointer-events: none; }
 
-    .question {
-      font-size: 1.1rem;
-      color: #222;
-      font-weight: 500;
-      text-align: center;
-    }
+  .title-big {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2.4rem, 8vw, 5rem);
+    color: #fff;
+    margin-bottom: 2.4rem;
+    text-shadow: 0 0 40px rgba(255,50,50,0.45);
+    opacity: 0;
+    animation: fadeDown 1s 0.3s forwards;
+  }
 
-    .buttons {
-      display: flex;
-      gap: 20px;
-    }
+  .terminal-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(220,40,40,0.3);
+    border-radius: 6px;
+    padding: 1.5rem 2rem;
+    max-width: 420px; width: 90vw;
+    opacity: 0;
+    animation: fadeUp 1s 0.8s forwards;
+  }
 
-    .btn {
-      font-family: 'Nunito', sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #222;
-      background: #fff;
-      border: 1.5px solid #bbb;
-      border-radius: 4px;
-      padding: 8px 32px;
-      cursor: pointer;
-    }
+  .t-line {
+    color: #ff4444; font-size: 0.8rem;
+    margin-bottom: 0.8rem;
+    white-space: nowrap; overflow: hidden; width: 0;
+  }
+  .t-line.l1 { animation: type1 1.5s steps(40) 1.2s forwards; border-right: 2px solid #ff4444; }
+  .t-line.l2 { animation: type2 1.2s steps(35) 2.9s forwards; }
+  .spacer { height: 1rem; opacity: 0; animation: fadeIn 0.1s 4.2s forwards; }
 
-    .btn:hover { background: #f5f5f5; }
+  .btn {
+    display: block; width: 100%;
+    padding: 0.75rem 1rem;
+    background: #e02020; border: none; border-radius: 4px;
+    color: #fff; font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem; letter-spacing: 0.12em;
+    cursor: pointer; text-transform: uppercase;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    opacity: 0; animation: fadeIn 0.5s 4.4s forwards;
+  }
+  .btn:hover { background: #ff4444; box-shadow: 0 0 20px rgba(255,50,50,0.5); transform: translateY(-1px); }
+  .btn:active { transform: translateY(1px); }
 
-    .cat-img { width: 220px; }
+  .hint {
+    text-align: center; color: rgba(255,255,255,0.22);
+    font-size: 0.68rem; margin-top: 0.6rem;
+    opacity: 0; animation: fadeIn 0.5s 4.6s forwards;
+  }
 
-    /* thank you */
-    #thank-you {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      text-align: center;
-    }
-    .thank-text {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #d63777;
-      line-height: 1.6;
-    }
+  #screen-heart {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1s ease;
+  }
+  #screen-heart.visible { opacity: 1; pointer-events: all; }
+  #screen-heart::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 58% 52% at 50% 47%, rgba(150,15,15,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-    #question-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 22px;
-    }
+  canvas { display: block; }
 
-    /* "Нет" needs to jump freely on screen */
-    #btnNo { position: fixed; }
-  </style>
+  .love-text {
+    position: absolute;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.3rem, 4.5vw, 2.6rem);
+    color: #fff;
+    text-shadow: 0 0 28px rgba(255,100,100,0.9), 0 0 55px rgba(255,40,40,0.45);
+    opacity: 0; transition: opacity 1.2s 0.7s;
+    pointer-events: none; user-select: none;
+  }
+  #screen-heart.visible .love-text { opacity: 1; }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:none} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:none} }
+  @keyframes fadeIn   { to{opacity:1} }
+  @keyframes type1 { from{width:0} to{width:100%;border-right-color:transparent} }
+  @keyframes type2 { from{width:0} to{width:100%} }
+</style>
 </head>
 <body>
-<div class="container">
 
-  <div id="question-state">
-    <p class="question">Будешь моей девушкой?)</p>
-
-    <div class="buttons">
-      <button class="btn" id="btnYes">Да</button>
-      <button class="btn" id="btnNo">Нет</button>
-    </div>
-
-    <img class="cat-img" src="data:image/jpeg;base64,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" alt="cat" />
+<div id="screen-intro">
+  <div class="title-big">Love you.</div>
+  <div class="terminal-box">
+    <div class="t-line l1">[System] Initializing heart.PROTOCOL_v2.0 ...</div>
+    <div class="t-line l2">&gt; One encrypted package found for you.</div>
+    <div class="spacer"></div>
+    <button class="btn" id="decryptBtn">🔒 Decrypt Message</button>
+    <div class="hint">(or just click anywhere)</div>
   </div>
+</div>
 
-  <div id="thank-you">
-    <p class="thank-text">Спасибо что ты у меня есть,<br>люблю тебя ❤️</p>
-    <img class="cat-img" src="data:image/jpeg;base64,/9j/2wDFAAQFBQkGCQkJCQkKCAkICgsLCgoLCwwKCwoLCgwMDAwNDQwMDAwMDw4PDAwNDw8PDw0OERERDhEQEBETERMREQ0BBAYGCgkKCwoKCwsMDAwLDxASEhAPEhAREREQEh4iHBERHCIeF2oaExpqFxofDw8fGioRHxEqPC4uPA8PDw8PdAIEBAQIBggHCAgHCAYIBggICAcHCAgJBwcHBwcJCgkICAgICQoJCAgGCAgJCQkKCgkJCggJCAoKCgoKDhAODg53/8IAEQgAzADsAwEiAAIRAQMRAv/EAKwAAQABBAMBAAAAAAAAAAAAAAAIAQUGBwIDBAkQAAEDAgUEAQUAAAAAAAAAAAcEBQYCCAABAxAgETBAcBcSExUWkBEAAgADAwQNCQYHAAAAAAAAAQIAAxEEEiExQVFhBRATFCAiMlJxgYKR0TAzQmKSobHB4SMkQ3KT8RVAU2OQorISAQABAwIEBgICAwAAAAAAAAERACExQVFhcYGhECAwkdHwscFA8XCQ4f/aAAgBAQAAAACfwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABhXj2CAC0fPXY81+YARyjd2y+22AETtgWrRme6r7OmvZ13raO5OUK/olaIE/Q8BhOr5BwFnVc45ZdtzmFl1RprV30EyN89J59+htITgvJbI0x0sn1PAACKsYMrkBvXKQeD5OyZmw8eAWPc8Ztg3nP9G7m9hjMOdYyott/kKRZ0U8Wqp2yQxDFrbl2eaMiH9E75oDJbjl96Q0jFNi+Z7m4MBjLNh5rVdPUCnk4ezmQ03xtMBojGZOgAA0NicpR//aAAgBAgAAAAAAAAAAAAAAAAAAAAAAAAAAAClaFVFQpUFKqKqK8HOjhzKilaVFKqVf/9oACAEDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF16re7LlbesB29dDs6w/9oACAEBAAECAP4JyScRkh9x5d3I2QK4eivtl8twUMlARCqcdu5V5CcbKwiDJUkFy+ZmoaqRV8W5tFZIQXONlyTSRp1MRLBKaXtoCa/sTWXRk96epc4raUmJ4DY4IKKOLgxOwOeLYFwBjbDtcG1Mrq4OcguAcbn2Rw3c2uWW6JXGSyrwbjNSNF5AGo7bqzxPk4N66MjIr7VrZzPRYScF4qEWeD+T4npiRLN5Sjjtuohk6i4lTcnCzfuX1X5n5ITHeITMRkPD5r4c2qExbBgHX6Gws2CQMUtNC9qWbEUZz2Ao7fEoLj8F5ENxteb9lCbJk0UnLpWiyb6KN7nWYUOvYO+pbho+EeE9tivh/9oACAECAAECAPVOdWWe2ePq7PTh04//2gAIAQMAAQIA9Upm5Yi20tLNp1dPsUa9VW/3eP8A/9oACAEBAQM/Av8AAnJs3nHC6s/cMYkWrCXMDHRkPcfKrJRnbBVFTFrtLHcQVAzKt401mhjG5aRT1xh7QivlN5i4lDNP+g0n5CJlu+1nMVVs5xd+/NG8Qs6SzUBx0qcxrG/JIY8teK/T9fKXZKp/UfHoXH40gSLOnOmcZuvJ7oW1gsnFnDPztR8Y3vWRPN0LW6W9GmVfDuiUvm0aZrPFHj7otto80lPyoW95rGyk3PMHaVI2Q55/WMbID0z+sY2Ul55h7St8Y2Rk8pD1y/CHHnJIPQSvxrEhuUHTqr8Is83kzk76HuNDAskppmXm62OSDb5jT53GUN7beA+m0JyMjZHFDBslqeQ3pVXtLiPd5FbJLMxgSBTAa4s87Akyj62TvyRWKzJKeqT7Rp8ouKq81QO7aS1zN0vGWfSoOV9Ys9nySwx0txj4RThJM5SK3SAYssz8O7+U0+kL+HNI1MK/CkWoUWoZa87Aa6GBZ5ay1yKKbZkWhJy4XqHtJ9KQJyK4yOAe+FlirMFGk4RZpXJJmn1fE0EOeRJUfmJPwpG6IrEXbyg3TmrwFmgq6hlOYxJmYyjuJ0ZV7otexDYj7PRllnoOYx/ELVKYLdrua068fj/JSzJoWAmKwKjOcxifKlLIlDJWhoWbHHARa7Yb05rutzU9S/tEiXy6zTrwHcPGJUnkS1XoHDWYCrAMpygwWtLy7P6Ltcx5uuJ+6rZ5yFicK0ow6dO2NMLZZRmcqmQazG/lY3bhQ0OcY7T2J5YVVIbE11RvSTuoF4mgUdMG1SUmEXS2boNNqXYnCMGYkVNMwgOAwyMKjr4DvLcS2uORxToMM3HtMzqBqetjCWG0TN0NFustcuIOrTFlHPPZ8Ys4yCYeoeMS7XN3NUcVFQTTN18C2q673rudPRAJva6xsp/d9hfCNkR6L/o/SLYuUA9MvwpDyJpnKt9zXLU8roibbC+6Swt0CjAEdWO1m2lmqVYXgc0JZkuot2pr07W/ZYu+cTFdekRbrTckuGCS8hal1fGBIRUXIgptS7Uyu1agUwz9MXQAMAMBB0xe27Xa5x443HNjgOzpjeM1EY31IBJyYVx0xZaZGbpY/KkWRfw69LN4xJs+MuWqHTn78vD3Ozzm0I3vFIwnNrVe799sNlgQB5AaIGjg1SVM5rFT2v2jdbNJPq09nD5eR+6TOz/0I+7dMxvl/J1sszVdPvEE2dhzZhp3A8H/2gAIAQIAAz8C9h//2gAIAQMAAz8C9U9cdN+u3TxP/9oACAEBAgM/If8AQnl9JMmcJuykRG+ce8Ax6qHJJwP3tWQGt7iuwBSgDmAoD2eZjU1oElxw7+oSI+G4nc+RtnWs+4NmxehFMQtJeHAFpti1WtgOHWNhD209ROY9wNBKICbV+KFFQC2B9ttHKr748uTrH5WaVKMfTmexT4X3IVRPW+4BO5Tyf00ajR0uR+xp5Pttk/is1AjT5yT808cyz2GqrXF0HvXtWWaQm99SKaxAg9J5avAanuUZ5sfq5UijaW9T4yVvzdrq9Ze56K8UaiqDNqjU2It9mfclAEZHCYa4ZmahhT+mAHgSUEEGzDdtC03qKI/cbOgUWBAaea39nLlbru3b8KXsDPv+ionZz2sLTYWiSBczq81v43HGQtfKLjheie1KM8qDvVjZBt9jE0kc4V6Cq+tnIxMPLyZqKEjUqOq3mZOj0owymJP2ls7lCAHLu21NbqG1tP4Q5MFtbGcM9KIM2GBVlwtLo1OnGo+A25NL745338qhiL2Rvxz384zGASPSh68EQQm2TMkWlqYquqGZMQLZt18ToqFTgCxKQX0KnIoEyQkRg8Dc6s5RBBCRbW9WU1hgW+WNIvQHCyLlyzgx4E0ljeYMpLZtS7JE3BJ5JbOfU99M0rAWVlHH4DzqA5ATFpF2hxOlJA8UcPuHtRXXaL8mgMUsDUiCi2HyMS5c2MwCxERpmtlTawW6Kg8zQjsUcLzAJcrdNQy3iEvE52fBk0R7+Any1UBlFlVurfwSQFZLEsrpNodysNhABiZNJjO1Yup4xr1z4FJkFxAZix96xMgGgWKOqks6a+IITi9gwWRdlr3oQxsL7BOCLZo6vccL2O1Sa+4ij2YSBMFmJTDr5+UKd4GOLUb0HQr+HjYE1x+9YQPQej2raoMW8lk7AEnfupVZYvnLX6JIWJT0awTrI6A/hk7WHOL90owHkfyl8v8A/9oACAECAAM/IfYf/9oACAEDAgM/If8AFMJXNb/nxlFO9Sjb0UwpU+R3ffzf/9oACAEBAgM/EP8AQmJdQV3oCls2UEIUiIyFfECerqjt40A1TYaqFYvObTGgktBlMo/q9EBAAgyBuIlkT1L2GwafmmaFm3zUKAVWHLnsvmEb1lChWsnKWOhKPUfpYiJ566GnNwOUI61LXRYPeedq2SzxB88n7CHFVf4j0xPrR8FUhBpil2W3/a0y87gOXSLSjD+zur+20y+0/CFD+1FPTCXiSagnBIGQUtSawMk2rqybypqBpfif9CaAAABAFgDQqKWbgYk4qOIVY/7BHF9GEwGGPmSBdurYpYMw5Nsb9u4GIKJBwiWRpI/FCfPrNBlgP6mngfAuS0TWIStackqE6YAFgAgOQeYkc/RSps/+7mmV2buBO+nuf2X1G0Co3Ob63za4vjK30CA9imnKmbBC2uDxKO0qCYJyg6V9R3n6j00geqm6W3jjWJvITWK8owcjyDCIP1xZ1G45G5erIVsnjHZfS66LfbHvNYaFgZbWGKYLP4Tmgd4sBwzm1Jra/wBP9Ai03CK/bYusroDaV0jnteZrvQ71Yz2vhbzwUQY/Fdtm9P25f1qMLqVO4Lk4/wBgVPiyn1Kvv9cNEGDKw4ojxziElRoiJaOPhfyXkJfCU8i1bNiElkQLZUvUQyySb5BPhEpSRcRvCSGhmuBScROonk7XBsZhScQFlDFfbMIj7UBJIU3Ix2SVFhisDSJ9hFN5JV9q5yXmiAy2g18R1kfdh53Pc8PbzXpq7wtleuLnRIjh8DJdda4n4TLXf9HgZiXuaf14EYomXhkiLiNxLlZ4IUlhVViCWx4JM5OEY4A7AJtNfmLpC2DnpqMrmGFcVK4vhkprvBNglgQ3omDokBwdArH12fzTRLohafGeIs9hqacVOjAO0a1HBauCUq46b3VwE2ttVaCmckSe4C2zziUWVyJg6rkVZcs8XAWDTc5NF18P6V72Rf3b+eayv0UfjoYADQIPJEXIqsoTaN8q82rjj0ZQkEayByaF5ToLsfw2zLwKfxFSRPBpeeXf/9oACAECAAM/EPYf/9oACAEDAgM/EP8AFIEDQHzViSG0Or48UBEuJYrQXmJ80os5R6JwJsNNyq7t/J/3PN//2Q==" alt="cat" />
-  </div>
-
+<div id="screen-heart">
+  <canvas id="c"></canvas>
+  <div class="love-text">Love you.</div>
 </div>
 
 <script>
-  const btnNo  = document.getElementById('btnNo');
-  const btnYes = document.getElementById('btnYes');
-  const margin = 16;
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
 
-  // Position "Нет" in its natural place next to "Да" initially
-  requestAnimationFrame(() => {
-    const r = btnYes.getBoundingClientRect();
-    btnNo.style.left = (r.right + 20) + 'px';
-    btnNo.style.top  = r.top + 'px';
+function setSize() {
+  const s = Math.min(window.innerWidth, window.innerHeight) * 0.94;
+  canvas.width = canvas.height = s;
+}
+setSize();
+window.addEventListener('resize', () => { setSize(); initParticles(); });
+
+function heartPos(t, scale) {
+  const x =  16 * Math.pow(Math.sin(t), 3);
+  const y = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
+  return { x: x * scale, y: y * scale };
+}
+
+// Previous fracs: 0.052, 0.100, 0.148, 0.196, 0.244, 0.292, 0.342, 0.392, 0.444
+// Gap between each was ~0.048. Now gap = ~0.096 (2x), starting from same base.
+// But we only fit 5 orbits before hitting screen edge (~0.444 max).
+// So: 9 orbits with 2x spacing → up to frac 0.052 + 8*0.096 = 0.82 — too big.
+// Solution: keep 9 orbits but cap largest at ~0.46, so step = (0.46-0.052)/8 = 0.051
+// That IS the old spacing. "2x spacing" means we keep fewer orbits or accept bigger canvas use.
+// Best interpretation: double the gap, use 5 orbits that fit well on screen.
+// Actually let's keep all 9 but spread them so they go edge-to-edge properly:
+// start=0.045, step=0.096 → 0.045,0.141,0.237,0.333,0.429,0.525... too big.
+// Use start=0.04, step=0.072 → fits 7 orbits up to 0.472. Good.
+const ORBIT_DEFS = [
+  { frac: 0.040, words: 15,  speed: 0.18,  dir: -1, fontSize: 6.3,  color: [255,160,160] },
+  { frac: 0.112, words: 24,  speed: 0.13,  dir:  1, fontSize: 6.6,  color: [255,120,120] },
+  { frac: 0.184, words: 33,  speed: 0.10,  dir: -1, fontSize: 6.9,  color: [245, 85, 85] },
+  { frac: 0.256, words: 42,  speed: 0.08,  dir:  1, fontSize: 7.2,  color: [228, 58, 58] },
+  { frac: 0.328, words: 52,  speed: 0.065, dir: -1, fontSize: 7.5,  color: [210, 40, 40] },
+  { frac: 0.400, words: 63,  speed: 0.053, dir:  1, fontSize: 7.8,  color: [192, 26, 26] },
+  { frac: 0.472, words: 75,  speed: 0.043, dir: -1, fontSize: 8.1,  color: [174, 16, 16] },
+];
+
+let orbits = [];
+
+function initParticles() {
+  orbits = ORBIT_DEFS.map(def => {
+    const scale = (canvas.width * def.frac) / 16;
+    const particles = Array.from({ length: def.words }, (_, j) => ({
+      phase: (j / def.words) * Math.PI * 2
+    }));
+    return { ...def, scale, particles };
+  });
+}
+initParticles();
+
+let running = false, lastTs = null;
+const LABEL = 'i love you';
+
+function frame(ts) {
+  if (!running) return;
+  if (!lastTs) lastTs = ts;
+  const dt = Math.min((ts - lastTs) / 1000, 0.05);
+  lastTs = ts;
+
+  const S  = canvas.width;
+  const cx = S / 2;
+  const cy = S / 2 + S * 0.04;
+
+  ctx.clearRect(0, 0, S, S);
+
+  orbits.forEach(orb => {
+    const angSpeed = orb.dir * orb.speed * Math.PI * 2;
+    const [r, g, b] = orb.color;
+
+    ctx.font         = `bold ${orb.fontSize}px 'Share Tech Mono', monospace`;
+    ctx.fillStyle    = `rgba(${r},${g},${b},0.9)`;
+    ctx.shadowColor  = `rgba(255,80,80,0.55)`;
+    ctx.shadowBlur   = 6;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+
+    orb.particles.forEach(p => {
+      p.phase += angSpeed * dt;
+      const pos = heartPos(p.phase, orb.scale);
+      ctx.fillText(LABEL, cx + pos.x, cy + pos.y);
+    });
   });
 
-  function jumpNo() {
-    const bw = btnNo.offsetWidth;
-    const bh = btnNo.offsetHeight;
-    const x = margin + Math.random() * (window.innerWidth  - bw - margin * 2);
-    const y = margin + Math.random() * (window.innerHeight - bh - margin * 2);
-    btnNo.style.left = x + 'px';
-    btnNo.style.top  = y + 'px';
-  }
+  ctx.shadowBlur = 0;
+  requestAnimationFrame(frame);
+}
 
-  btnNo.addEventListener('mouseenter', jumpNo);
-  btnNo.addEventListener('touchstart', e => { e.preventDefault(); jumpNo(); }, { passive: false });
+function start() {
+  if (running) return;
+  running = true; lastTs = null;
+  requestAnimationFrame(frame);
+}
 
-  btnYes.addEventListener('click', () => {
-    document.getElementById('question-state').style.display = 'none';
-    btnNo.style.display = 'none';
-    document.getElementById('thank-you').style.display = 'flex';
-  });
+function reveal() {
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-heart').classList.add('visible');
+  setTimeout(start, 80);
+}
+
+document.getElementById('decryptBtn').addEventListener('click', e => { e.stopPropagation(); reveal(); });
+document.addEventListener('click', () => {
+  if (!document.getElementById('screen-heart').classList.contains('visible')) reveal();
+});
 </script>
 </body>
 </html>
